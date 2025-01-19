@@ -123,36 +123,36 @@ function struct.is(self, item: string)
 end
 
 function struct.new(folder)
-    local newStruct = setmetatable({files = {}, folders = {}, path = fixFile(folder)}, struct)
+    local newStruct = setmetatable({files = {}, folders = {}, path = folder}, struct)
 
     for i,v in listfiles(folder) do
-        v = fixFile(v)
-        local realName = string.split(v, "\\")
+        local path = folder .. "/" .. v
+        local realName = string.split(v, "/")
         realName = realName[#realName]
 
-        if isfolder(v) then
-            newStruct.folders[realName] = struct.new(v)
+        if isfolder(path) then
+            newStruct.folders[realName] = struct.new(path)
 
             continue
         end
 
         --realName = string.sub(realName, select(1, string.find(realName, ".lua")))
-        newStruct.files[realName] = v
+        newStruct.files[realName] = path
     end
 
     return newStruct
 end
 
 for i,v in listfiles(folderName) do
+    v = folderName .. "/" .. v
     if not isfolder(v) then continue end
-    local realName = string.split(v, "\\")
+    local realName = string.split(v, "/")
     realName = realName[#realName]
     folders[realName] = struct.new(v)
 end
 
 -- get("ui"):load("frame") -> (...)
 -- get("ui"):make("balls.lua", "stuff")
--- get("ui"):is("balls.lua")
 -- get("ui"):write("balls.lua", "stuff") -> (...)?
 -- get("ui"):append("balls.lua", "stuff\n")
 -- get("ui"):read("balls.lua") -> (string)
@@ -163,5 +163,3 @@ end
 getgenv().get = function(folder)
     return folders[folder]
 end
-
-return get
